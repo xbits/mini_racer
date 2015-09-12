@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<cars>
+	<car default="true">
+		<swf>Nissan Micra</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Suzuki Swift</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Ford Focus RS</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Mazda MX-5</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Toyota Supra</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Skyline R35 VSpec</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Lotus Elise</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Ford Focus RS WRC</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	
+	<car>
+		<swf>Gemballa Avalanche GTR</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	
+	<car>
+		<swf>SSC Ultimate Aero</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Zenvo ST1</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Toyota Celica Pikes Peak</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	
+	<car>
+		<swf>Saleen S7</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Porsche 911 GT2</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Pagani Zonda R</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	
+	<car>
+		<swf>Lamborghini Gallardo Polizia</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>IMSA Gallardo GTV</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Caterham Superlight R300</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Caterham Superlight R500</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+	<car>
+		<swf>Lotec Sirius</swf>
+		<name></name>
+		<price>10</price>
+		<stability>1</stability>
+		<horsepower>90</horsepower>
+		<maxSteer>1.047</maxSteer>
+		<wheelsOffset>0.92</wheelsOffset>
+	</car>
+</cars>

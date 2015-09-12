@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tracks>
+	<track>
+		<name>Aldora</name>
+		<swf>aldora</swf>
+		<thumb>aldora.png</thumb>
+		<size>Medium</size>
+	</track>
+	<track>
+		<name>Meryround</name>
+		<swf>meryround</swf>
+		<thumb>meryround.png</thumb>
+		<size>Medium</size>
+	</track>
+	<track>
+		<name>LongIsland</name>
+		<swf>longIsland</swf>
+		<thumb>longIsland.png</thumb>
+		<size>Short</size>
+	</track>
+	<track>
+		<name>Safrona Speedway</name>
+		<swf>speedway</swf>
+		<thumb>speedway.png</thumb>
+		<size>Long</size>
+	</track>
+	<track>
+		<name>Nightlife</name>
+		<swf>nightlife</swf>
+		<thumb>nightlife.jpg</thumb>
+		<size>??</size>
+	</track>
+</tracks>
