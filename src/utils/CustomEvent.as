@@ -2,7 +2,7 @@ package utils
 {
 	import flash.events.Event;
 	/**
-	 * Standard event extension to hold some extra data
+	 * Standard Event extension to hold some extra data
 	 * @author João Costa
 	 */
 	public class CustomEvent extends Event
