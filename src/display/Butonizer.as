@@ -2,8 +2,10 @@ package display
 {
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	
 	/**
-	 * ...
+	 * Helper to create buttons lazy bsterd mode.
+	 * 
 	 * @author João Costa
 	 */
 	public class Butonizer 

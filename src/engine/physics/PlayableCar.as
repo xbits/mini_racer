@@ -6,28 +6,20 @@ package engine.physics
 	import Box2D.Dynamics.Joints.*;
 	import Box2D.Collision.Shapes.*; 
 	import engine.models.CarParams;
+	import engine.models.LaunchParams;
 	import engine.RacingWorld;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	/**
-	 * ...
+	 * Bridges a player's car in the physics world.
+	 * TODO: Too tighly coupled with CarParams
+	 * 
 	 * @author João Costa
 	 */
 	public class PlayableCar
 	{
-		//TODO these constants should be vars in car_params-----------------
-		public static const MAX_STEER_ANGLE:Number = Math.PI / 3;
-		public static const HORSEPOWER:Number = 90;
-		public static const OFF_CENTER_FACTOR:Number = 0.1;
-		public static const FRONT_WHEEL_OFFSET:Number = 0.9;
-		public static const REAR_WHEEL_OFFSET:Number = 0.9;
-		public static const STEER_SPEED:Number = 1.5;
-		public static const STABILITY:Number = 3;
-		//public const rearWheelPosition:b2Vec2 = new b2Vec2(0, 1.90);
-		//public const frontWheelPosition:b2Vec2 = new b2Vec2(0, -1.9);
-		//END TODO-----------------------------
-		
+
 		public static const TWO_PI:Number = Math.PI * 2;
 		
 		public var body:b2Body;
@@ -41,7 +33,13 @@ package engine.physics
 		public var carSprite:Sprite;
 		public var carParams:CarParams;
 		
-		
+		/**
+		 * Build a new physics car from the sprite dimensions and car data definitions
+		 * @param	carSprite
+		 * @param	carParams
+		 * @param	world
+		 * @param	isOracle
+		 */
 		public function PlayableCar(carSprite:Sprite,carParams:CarParams,world:b2World, isOracle:Boolean = false) 
 		{
 			this.world = world;
@@ -72,7 +70,7 @@ package engine.physics
 			bodyDef.userData = {sprite: carSprite};
 			
 			bodyDef.linearDamping = 1;
-			bodyDef.angularDamping = 1;
+			bodyDef.angularDamping = 0.8;
 			bodyDef.position = carInitialPosition.Copy();
 			bodyDef.type = b2Body.b2_dynamicBody;
 			bodyDef.allowSleep = true;
@@ -91,8 +89,8 @@ package engine.physics
 			var circleShape:b2CircleShape = new b2CircleShape(carWidth*.5);
 			circleShape.SetLocalPosition(new b2Vec2(0, bumpersOffset));
 			fixtureDef.shape = circleShape;
-			fixtureDef.friction = 1;
-			fixtureDef.density = 1;
+			fixtureDef.friction = 0.1;
+			fixtureDef.density = 0.5 + 2.5/carParams.stability;
 			fixtureDef.restitution = 0.3;
 			body.CreateFixture(fixtureDef);
 			
@@ -100,13 +98,13 @@ package engine.physics
 			circleShape = new b2CircleShape(carWidth*.5);
 			circleShape.SetLocalPosition(new b2Vec2(0, -bumpersOffset));
 			fixtureDef.shape = circleShape;
-			fixtureDef.friction = 1;
-			fixtureDef.density = 1;
+			fixtureDef.friction = 0.1;
+			fixtureDef.density = 0.5 + 2.5/carParams.stability;
 			fixtureDef.restitution = 0.3;
 			body.CreateFixture(fixtureDef);
 			
 			//---define front wheel---
-			var frontWheelPosition:b2Vec2 = new b2Vec2(0, -carHeight * .5 * FRONT_WHEEL_OFFSET);
+			var frontWheelPosition:b2Vec2 = new b2Vec2(0, -carHeight * .5 * CarParams.FRONT_WHEEL_OFFSET);
 			var frontWheelDef:b2BodyDef = new b2BodyDef();
 			frontWheelDef.type = b2Body.b2_dynamicBody;
 			frontWheelDef.position = carInitialPosition.Copy();
@@ -115,12 +113,12 @@ package engine.physics
 			boxShape.SetAsBox(0.2, 0.5);
 			fixtureDef.shape = boxShape;
 			fixtureDef.friction = 0.4;
-			fixtureDef.density = 1*STABILITY;
+			fixtureDef.density = 1*carParams.stability;
 			frontWheel = world.CreateBody(frontWheelDef);
 			frontWheel.CreateFixture(fixtureDef);
 			
 			//---define rear wheel---
-			var rearWheelPosition:b2Vec2 = new b2Vec2(0, carHeight * .5 * FRONT_WHEEL_OFFSET);
+			var rearWheelPosition:b2Vec2 = new b2Vec2(0, carHeight * .5 * CarParams.REAR_WHEEL_OFFSET);
 			var rearWheelDef:b2BodyDef = new b2BodyDef();
 			rearWheelDef.type = b2Body.b2_dynamicBody;
 			rearWheelDef.position = carInitialPosition.Copy();
@@ -129,7 +127,7 @@ package engine.physics
 			boxShape.SetAsBox(0.2, 0.5);
 			fixtureDef.shape = boxShape;
 			fixtureDef.friction = 0.4;
-			fixtureDef.density = 1*STABILITY;
+			fixtureDef.density = 1*carParams.stability;
 			rearWheel = world.CreateBody(rearWheelDef);
 			rearWheel.CreateFixture(fixtureDef);
 			
@@ -158,16 +156,24 @@ package engine.physics
 			
 			//steer
 			var mspeed:Number = -frontJoint.GetJointAngle();
-			frontJoint.SetMotorSpeed(mspeed * STEER_SPEED);
+			frontJoint.SetMotorSpeed(mspeed * CarParams.STEER_SPEED);
 		}
 		
+		/**
+		 * restricts angle to -PI..PI
+		 * @param	a
+		 * @return
+		 */
 		private function normalizeAngle(a:Number):Number{
 			return a - TWO_PI * Math.floor((a + Math.PI) / TWO_PI);
 		}
 			
-		//This function applies a "friction" in a direction orthogonal to the body's axis.
-		//It applies 100% friction in reality but since it is only applied to the wheels 
-		// it results in being only friction because the car body keeps its momentum
+		/**
+		 * This function applies a "friction" in a direction orthogonal to the body's axis.
+		 * It applies 100% friction in reality but since it is only applied to the wheels 
+		 * it results in being only friction because the car body keeps its momentum
+		 * @param	targetBody
+		 */
 		public function killOrthogonalVelocity(targetBody:b2Body):void{
 			var localPoint:b2Vec2 = new b2Vec2(0, 0);
 			var velocity:b2Vec2 = targetBody.GetLinearVelocityFromLocalPoint(localPoint);
@@ -177,41 +183,48 @@ package engine.physics
 			targetBody.SetLinearVelocity(sidewaysAxis); //targetBody.GetWorldPoint(localPoint));
 		}
 		
-		
-		public function launchFrom(from:b2Vec2):Number {
+		/**
+		 * Applies an impulse to the car body.
+		 * @param	launchP Expected to have 'from' attribute set. 
+		 * @return LaunchParams same instance that came in parameters
+		 */
+		public function launchFrom(launchP:LaunchParams):LaunchParams {
+			//tranform vector to represent CAR->mousePos
+			launchP.from.Subtract(body.GetWorldCenter().Copy());
 			
-			from.Subtract(body.GetWorldCenter().Copy());
+			var newWheelAngle:Number = Math.atan2(-launchP.from.x, launchP.from.y) - (body.GetAngle());
+			newWheelAngle = normalizeAngle(newWheelAngle); // normalize angle to [-PI,PI]
 			
-	
-			var newWheelAngle:Number = Math.atan2(-from.x, from.y) - (body.GetAngle());
-			newWheelAngle = normalizeAngle(newWheelAngle); // 
-			
+			var mSteerA:Number = carParams.maxSteerAngle;
 			//confine the wheel angle to the allowed steering angle, it get little dense because of angle shift from -halfCircle to +halfCircle
 			// I suspect there is a more fancy way to do this by shifting quadrants of something...
-			var backwardsLaunch:Boolean = false;
+			launchP.backwards = false;
 			if(newWheelAngle > Math.PI*.5){
-				backwardsLaunch = true;
-				newWheelAngle = Math.max( Math.PI - MAX_STEER_ANGLE, Math.min(MAX_STEER_ANGLE-Math.PI, newWheelAngle)) ;
+				launchP.backwards = true;
+				newWheelAngle = Math.max( Math.PI - mSteerA, Math.min(mSteerA-Math.PI, newWheelAngle)) ;
 			}else if(newWheelAngle < - Math.PI * .5){
-				 backwardsLaunch = true;
-				 newWheelAngle = Math.max( -Math.PI, Math.min(MAX_STEER_ANGLE-Math.PI, newWheelAngle)) ;
+				 launchP.backwards = true;
+				 newWheelAngle = Math.max( -Math.PI, Math.min(mSteerA-Math.PI, newWheelAngle)) ;
 			}else{
-				newWheelAngle = Math.max( -MAX_STEER_ANGLE, Math.min(MAX_STEER_ANGLE, newWheelAngle)) ;
+				newWheelAngle = Math.max( -mSteerA, Math.min(mSteerA, newWheelAngle)) ;
 			}
 			frontWheel.SetPositionAndAngle(frontWheel.GetPosition().Copy(), newWheelAngle + body.GetAngle());
 			
-			var distance:Number = from.Length();//TODO get max_strength from car params
+			//fill launchParams with new angle
+			launchP.angle = newWheelAngle + body.GetAngle();
 			
+			//apply the calculated force in the car axis
 			var forwardVec:b2Vec2 = body.GetTransform().R.col2.Copy();
-			forwardVec.Multiply( -HORSEPOWER * distance);
-
+			var dirMult:int = launchP.backwards ? -1 : 1;
+			forwardVec.Multiply( -launchP.power * dirMult);
+			
 			body.ApplyImpulse(forwardVec, body.GetPosition().Copy());
 			
-			return newWheelAngle + body.GetAngle();
+			return launchP;
 		}
 		
 		/**
-		 * For oracle cars copying of the real car physics status 
+		 * For oracle cars duplication of the real car physics status 
 		 * 
 		 * @param	targetCar the car from which the properties will be extracted
 		 */

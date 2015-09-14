@@ -6,6 +6,7 @@ package engine
 	import Box2D.Dynamics.Joints.*;
 	import Box2D.Collision.Shapes.*; // define our shapes
 	import engine.models.CarParams;
+	import engine.models.LaunchParams;
 	import engine.models.Player;
 	import engine.physics.PlayableCar;
 	import flash.display.DisplayObject;
@@ -14,8 +15,11 @@ package engine
 	import flash.geom.Rectangle;
 	
 	import flash.display.Sprite;
+	
 	/**
-	 * ...
+	 * Controls the track and physics 
+	 * Bridges between gameplay and physics worlds
+	 * 
 	 * @author João Costa
 	 */
 	public class RacingWorld 
@@ -23,60 +27,82 @@ package engine
 		public static const EVT_UPDATE:String = 'worldUpdate';
 		public static const CAR_INSTANCE_NAME:String = "playerCar";//TODO this is for one player only
 		public static const SCALE:Number = 10;
+		static private const ORACLE_DEPTH:uint = 8;
+		
+		public static const MIN_LAUNCH_DIST:Number = 8.5;//this is dependent on the launcher drawing...should be set dynamically and somewhere else...
+		public static const MAX_LAUNCH_DIST:Number = 158;//Idem
+		
 		
 		public var world:b2World;
 		public var oracleWorld:b2World;
-		
+	
 		public var worldSprite:Sprite;
+		private var projectionSprite:Sprite;//oracle debug container currently used for launcher display...to be removed 
 		
-		public var cars:Vector.<PlayableCar> = new Vector.<PlayableCar>();
-		public var oracleCars:Vector.<PlayableCar> = new Vector.<PlayableCar>();
+		private var cars:Vector.<PlayableCar>;
+		private var oracleCars:Vector.<PlayableCar>;
 		private var players:Vector.<Player>;
-		public var activePlayerIndex:int = 0;
+		public var activePlayerIndex:int;
 		
-		public var checkPoints:Array = [];
-		
+		private var checkPoints:Array;//
 		
 		
 		public function RacingWorld() {
 
 		}
-		
-		public function predictLaunchFrom(fromPoint:Point):Array {
-			
+		/**
+		 * Build launch params and cycles the oracle world for a path prediction 
+		 * @param	fromPoint
+		 * @return LaunchParams
+		 */
+		public function predictLaunchFrom(fromPoint:Point):LaunchParams {
 			
 			var oracleCar:PlayableCar = activeOracleCar;
 			var car:PlayableCar = activeCar;
 			//---reset oracle and set its positions
+			hideOracles();//hack to show prediction with the box2d debug draw...TODO replace with proper ghost
 			oracleCar.imitateStatus(car);
 			
-			var from:b2Vec2 = new b2Vec2(fromPoint.x / SCALE, fromPoint.y / SCALE);
-			oracleCar.launchFrom(from);
+			var launchP:LaunchParams = new LaunchParams(players[activePlayerIndex], fromPoint, SCALE);
+			oracleCar.launchFrom(launchP);
 			
-			var path:Array = [];
 			var curPos:b2Vec2;
 			oracleWorld.ClearForces();
-			while(oracleCar.body.IsAwake() && path.length < 6){
+			while(oracleCar.body.IsAwake() && launchP.projectedPath.length < ORACLE_DEPTH){
 				oracleWorld.Step(1 /30, 8, 8);
 				oracleWorld.ClearForces();
 				oracleCar.onWorldUpdate();
 				curPos = oracleCar.body.GetPosition();
-				path.push(new Point(curPos.x * SCALE, curPos.y * SCALE));
+				//launchP.addPathPoint(curPos.x - worldSprite.x , curPos.y-worldSprite.y);
+				launchP.projectedPath.push(worldSprite.localToGlobal(new Point(curPos.x*SCALE , curPos.y*SCALE)));
 			}
-			//TODO launch and step on oracle 
-			return path;
+			
+			oracleWorld.DrawDebugData();
+			world.DrawDebugData();//validation of active is inside
+			
+			//TODO draw ghost stuff
+		//	launchP.projectedCarPos = new Point(curPos.x * SCALE, curPos.y * SCALE);
+		//	launchP.projectedCarRotation = oracleCar.body.GetAngle() / (Math.PI / 180);
+		//	launchP.projectedWheelsAngle = oracleCar.frontWheel.GetAngle() / (Math.PI / 180) - launchP.projectedCarRotation;
+				
+			return launchP;
 		}
 		
+		/**
+		 * Launch the active car
+		 * @param	fromPoint
+		 */
 		public function launchFrom(fromPoint:Point ):void {
-			
+			projectionSprite.graphics.clear()//TODO replace this hack with proper ghost
 			var car:PlayableCar = activeCar;
-			trace('world builder .launch from',car);
-			var from:b2Vec2 = new b2Vec2(fromPoint.x / SCALE, fromPoint.y / SCALE);
-			car.launchFrom(from);
-			
+			var launchP:LaunchParams = new LaunchParams(players[activePlayerIndex], fromPoint, SCALE);
+			car.launchFrom(launchP);
 		}
-		
-		public function update():void {
+		/**
+		 * Physics step
+		 * @return
+		 */
+		public function update():Boolean {
 			world.Step(1 / 30, 8, 8);
 			world.ClearForces();
 			//world.DrawDebugData();
@@ -88,17 +114,28 @@ package engine
 			}
 			var body:b2Body = world.GetBodyList();
 			var userData:Object;
-		//	trace('body',body);
+			var allSleeping:Boolean = false;
+			var maxAngularVel:Number = 0;
+			var maxVel:Number = 0;
 			//update all displayObjects with the position from physics world
 			while (body) {
 				userData = body.GetUserData();
 				if (userData && userData.sprite) {
 					userData.sprite.x = body.GetPosition().x * SCALE;
 					userData.sprite.y = body.GetPosition().y * SCALE;
-					userData.sprite.rotation = body.GetAngle() * (180 / Math.PI) ; //why -90º is this just for the car?	
+					userData.sprite.rotation = body.GetAngle() * (180 / Math.PI) ;
+					
+					if (body.IsAwake()) {
+						maxAngularVel = Math.max(maxAngularVel, body.GetAngularVelocity());
+						maxVel = Math.max(maxVel, body.GetLinearVelocity().Copy().Length());
+					}
 				}
 				body = body.GetNext();
 			}
+			
+			allSleeping = maxAngularVel < 0.05 && maxVel < 0.4;
+			
+			return allSleeping;
 		}
 		
 		public function get activeCar():PlayableCar {
@@ -108,12 +145,52 @@ package engine
 			return oracleCars[activePlayerIndex];
 		}
 		
+		/**
+		 * Helper for hack to show box2d debug for path prediction. 
+		 * Can be removed when proper ghosts are added
+		 */
+		private function hideOracles():void {
+			for each(var oracle:PlayableCar in oracleCars) {
+				if(activeOracleCar != oracle){
+					oracle.body.SetPosition(new b2Vec2( -5000, -5000));
+				}
+			}
+		}
+		
+		/**
+		 * prepare for GC
+		 */
+		public function unload():void {
+			players = null;
+			worldSprite = null;
+			checkPoints = null;
+			projectionSprite = null;
+			world = null;
+			oracleWorld = null;
+			cars = null;
+			oracleCars = null;
+		}
+		
+		//-------------track building stuff....could maybe go to another class-----------------------------
+		//---------------------------------------------------------------------------------------------
+		
+		/**
+		 * Builds the physical and logical world from a custom formated track swf
+		 * @param	sourceTrack
+		 * @param	players
+		 */
 		public function build(sourceTrack:Sprite,players:Vector.<Player>):void {
 			this.players = players;
 			this.worldSprite = sourceTrack;
+			this.checkPoints = [];
+			
+			cars = new Vector.<PlayableCar>();
+			oracleCars = new Vector.<PlayableCar>();
 			
 			world = new b2World(new b2Vec2(0, 0.0), true);
 			oracleWorld = new b2World(new b2Vec2(0, 0.0), true);
+			
+			projectionSprite = initWorldDebug(oracleWorld);//leave this on  to show ghost
 			
 			var dispObj:DisplayObject
 			var carIndex:int;
@@ -132,6 +209,7 @@ package engine
 			
 			var garbageFromBullet:Array = [];
 			
+			//This could use some factory class instead...to reduce method size
 			for (i = 0; i < worldSprite.numChildren; i++ ) {
 				
 				dispObj = worldSprite.getChildAt(i);
@@ -140,8 +218,10 @@ package engine
 					buildCars(dispObj);
 				}else if (dispObj.name.search("CP")==0){
 					checkPoints.push(dispObj)
+					trace("TrackBuilder-- Found checkpoint :", dispObj.name)
 				}else if (dispObj.name.search("FINISH")==0){
 					checkPoints.push(dispObj)
+					trace("TrackBuilder-- Found finish :", dispObj.name)
 				}else if (dispObj.name == "moneyBox") {
 					trace("TrackBuilder-- Found money box :", dispObj.name)
 					//	moneyInstance.moneyBox = childObj;
@@ -178,7 +258,7 @@ package engine
 					
 					bodyDef = new b2BodyDef();
 					bodyDef.userData = { sprite: dispObj };
-					bodyDef.linearDamping = 0.9;
+					bodyDef.linearDamping = 0.99;
 					bodyDef.angularDamping = 0.9;
 					bodyDef.position.Set(dispObj.x/SCALE, dispObj.y/SCALE);
 					bodyDef.allowSleep = true;
@@ -238,13 +318,17 @@ package engine
 				}
 			}
 			
+			checkPoints.sortOn("name");
 			//throw out the garbage
 			for (var j:int = 0; j < garbageFromBullet.length; j++) {
 				garbageFromBullet[j].parent.removeChild(garbageFromBullet[j]);
 			}
 		}
 		
-		
+		/**
+		 * Builds one car for each player on the players list
+		 * @param	trashCar
+		 */
 		private function buildCars(trashCar:DisplayObject):void {
 			
 			var radians:Number = (trashCar.rotation + 90) * (Math.PI / 180);
@@ -267,13 +351,19 @@ package engine
 				worldSprite.addChild(carSprite);
 				worldSprite.setChildIndex(carSprite, carIndex)
 						
-				cars.push(new PlayableCar(carSprite, new CarParams(), world));
-				oracleCars.push(new PlayableCar(carSprite, new CarParams(), oracleWorld, true));
+				cars.push(new PlayableCar(carSprite, players[i].carData, world));
+				oracleCars.push(new PlayableCar(carSprite, players[i].carData, oracleWorld, true));
 			}
 			worldSprite.removeChild(trashCar);
 			//trashCar.visible = false;//remove is better buth meh...we might need it for later
 		}
 		
+		/**
+		 * For world building
+		 * Returns a rectangle of the display object at zero rotation
+		 * @param	dObj
+		 * @return 
+		 */
 		private function getAlignedRect(dObj:DisplayObject):Rectangle {
 			var origRot:Number = dObj.rotation;
 			dObj.rotation = 0;
@@ -282,6 +372,26 @@ package engine
 			return rec;
 		}
 		
+		/**
+		 * Creates box2d drawble sprite
+		 * @param	world
+		 * @return the sprite that will be drawn upon
+		 */
+		public function initWorldDebug(world:b2World):Sprite{
+			var m_sprite:Sprite;
+			m_sprite = new Sprite();
+			worldSprite.addChild(m_sprite);
+			var dbgDraw:b2DebugDraw = new b2DebugDraw();
+			dbgDraw.SetSprite(m_sprite);
+			dbgDraw.SetDrawScale(RacingWorld.SCALE);
+			//dbgDraw.SetAlpha(1);
+			dbgDraw.SetFillAlpha(0.5);
+			dbgDraw.SetLineThickness(1);
+			dbgDraw.SetFlags(b2DebugDraw.e_shapeBit);
+			world.SetDebugDraw(dbgDraw);
+			
+			return m_sprite;
+		}
 	}
 
 }

@@ -1,7 +1,7 @@
 package engine.models 
 {
 	/**
-	 * ...
+	 * Represents a car static parameters extracted from car definitions XML
 	 * @author João Costa
 	 */
 	public class CarParams 

@@ -1,10 +1,14 @@
 package display 
 {
+	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
+	import flash.display.Sprite;
+	import flash.geom.Matrix;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	/**
-	 * ...
+	 * Some helpers for display stuff
 	 * @author João Costa
 	 */
 	public class DisplayUtils 
@@ -43,6 +47,13 @@ package display
 			}
 		}
 		
+		/**
+		 * Tries to get a child from display tree recusivelly
+		 * NOTICE: WTF is wrong with flash new preloaders and TFT fields...FUUU
+		 * @param	dsObject
+		 * @param	childName
+		 * @return
+		 */
 		static public function getChildByName(dsObject:DisplayObjectContainer, childName:String):DisplayObject
 		{
 			 var i:int = 0;
@@ -65,6 +76,11 @@ package display
 			 return null;
 		}
 		
+		/**
+		 * traces displayObjectContainer tree
+		 * @param	dsObject
+		 * @param	iDepth
+		 */
 		static public function traceChildrenNames(dsObject:DisplayObjectContainer, iDepth:int = 0):void
 		{
 			 var i:int = 0;
@@ -86,6 +102,24 @@ package display
 			 }
 		}
 		
+		/**
+		 * Converts miliseconds to string in format mm:ss:nnnn (n for mili?!?)
+		 * 
+		 * @param	milis
+		 * @return
+		 */
+		static public function milisToStr(milis:int):String {
+			var seconds:int = Math.floor((milis/1000) % 60);
+			var strSeconds:String = (seconds < 10) ? ("0" + String(seconds)):String(seconds);
+			var minutes:int = Math.round(Math.floor(milis/60000));
+			var strMinutes:String = (minutes < 10) ? ("0" + String(minutes)):String(minutes);
+			var strMilliseconds:String = milis.toString();
+			strMilliseconds = strMilliseconds.slice(strMilliseconds.length -3, strMilliseconds.length)
+			var timeCode:String = strMinutes + ":" + strSeconds + ':' + strMilliseconds;
+			return timeCode;
+		}
+		
+
 	}
 
 }
