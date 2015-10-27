@@ -62,7 +62,6 @@ package engine.models
 		/**
 		 * This will bug if car is moved...
 		 * 
-		 * 
 		 */
 		private function getCarClone():Sprite {
 			//FIXME not working

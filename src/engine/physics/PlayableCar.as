@@ -11,8 +11,9 @@ package engine.physics
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	
 	/**
-	 * Bridges a player's car in the physics world.
+	 * Bridges a player's car to the physics world.
 	 * TODO: Too tighly coupled with CarParams
 	 * 
 	 * @author João Costa
@@ -197,7 +198,7 @@ package engine.physics
 			
 			var mSteerA:Number = carParams.maxSteerAngle;
 			//confine the wheel angle to the allowed steering angle, it get little dense because of angle shift from -halfCircle to +halfCircle
-			// I suspect there is a more fancy way to do this by shifting quadrants of something...
+			// I suspect there is a fancier way to do this by shifting quadrants of something...
 			launchP.backwards = false;
 			if(newWheelAngle > Math.PI*.5){
 				launchP.backwards = true;

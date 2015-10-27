@@ -22,7 +22,7 @@ package
 	 * Main class
 	 * 
 	 * Controls views flow and assets loading.
-	 * It maybe be split into 2 or more classes.
+	 * It could maybe be split into 2 or more classes.
 	 * 
 	 * Splash screen and sound were an afterthought so they are not neatly placed.
 	 * 

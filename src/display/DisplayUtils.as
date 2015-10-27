@@ -54,18 +54,18 @@ package display
 		 * @param	childName
 		 * @return
 		 */
-		static public function getChildByName(dsObject:DisplayObjectContainer, childName:String):DisplayObject
+		static public function getChildByName(container:DisplayObjectContainer, childName:String):DisplayObject
 		{
 			 var i:int = 0;
 			 var sDummyTabs:String = "";
 			 var dsoChild:DisplayObject;
 			 var subChild:DisplayObject;
 			 
-			 for (i = 0; i < dsObject.numChildren ; ++i)
+			 for (i = 0; i < container.numChildren ; ++i)
 			 {
-				 dsoChild = dsObject.getChildAt(i);
-				 if (dsObject.name == childName) {
-					return dsObject; 
+				 dsoChild = container.getChildAt(i);
+				 if (container.name == childName) {
+					return container; 
 				 } else if (dsoChild is DisplayObjectContainer && 0 < DisplayObjectContainer(dsoChild).numChildren){
 					 subChild = getChildByName(dsoChild as DisplayObjectContainer,childName);
 					 if (subChild) {

@@ -50,7 +50,7 @@ package screens
 		
 		/**
 		 * Constructor
-		 * Extracts DisplayObjects and Classes from the loaded hudAsset
+		 * Extracts references to DisplayObjects and Classes from the loaded hudAsset
 		 * 
 		 * @param	hudAsset swf with the graphics
 		 */

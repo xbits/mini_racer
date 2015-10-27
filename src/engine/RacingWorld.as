@@ -44,7 +44,7 @@ package engine
 		private var players:Vector.<Player>;
 		public var activePlayerIndex:int;
 		
-		private var checkPoints:Array;//
+		public var checkPoints:Array;//
 		
 		
 		public function RacingWorld() {
@@ -158,7 +158,7 @@ package engine
 		}
 		
 		/**
-		 * prepare for GC
+		 * prepare for GC un-needed...i think...a simples racingWorld = null; at the right loaction will do
 		 */
 		public function unload():void {
 			players = null;

@@ -24,7 +24,7 @@ package engine
 	public class GamePlay extends Sprite 
 	{
 		static public const EVT_GAME_OVER:String = "evtGameOver";
-		static private const MAX_MOVE_TIME:String = 10000;//ten secs
+		static private const MAX_MOVE_TIME:int = 10000;//ten secs
 		
 		public var racingWorld:RacingWorld;
 		private var hud:HUD;

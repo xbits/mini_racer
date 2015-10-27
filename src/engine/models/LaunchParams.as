@@ -8,6 +8,7 @@ package engine.models
 	 * Holds the launch params to be shared between display and physics calcs 
 	 * 
 	 * This class is terribly tightly coupled with PlayableCar
+	 * 
 	 * Point objs refer to pixels. b2vec2 refer to physical coords.
 	 * Rotations to degrees. Angles to radians.
 	 * 
